@@ -1,0 +1,143 @@
+In order to run this on cloud9,
+
+You need to navigate to the ~/workspace/tut_ang2_villalobos/angular2 directory, and enter 'gulp', which will compile the ts, and launch a server.
+
+To install all this, you need to launch >> npm -install, which will access the package.json and install all dependancies
+
+
+
+-you need to specifiy the port and host in the webserver task of the gulpfile.js, thus:
+
+gulp.task('webserver', function() {
+  gulp.src(appSrc)
+    .pipe(webserver({
+      livereload: true,
+      port: process.env.PORT,
+      host: process.env.IP,
+      open: true
+    }));
+});
+
+####################################################################
+
+to start server, run > gulp
+
+If you get this error:
+/home/ubuntu/workspace/tut_ang2_villalobos/angular2/node_modules/angular2/src/facade/promise.d.ts(1,10): error TS2661: Cannot re-export name that is not defined in the module.
+
+Then: add
+            declare var Promise: PromiseConstructor;
+on the top of promise.d.t
+
+####################################################################
+
+page would not load until I changed line 8 above to read:
+    host: '0.0.0.0',
+
+####################################################################
+
+structure:
+
+If we use gulpfile.js to run the app, then all the writing gets done in /process/typescript, as .ts files. These are then
+compiled into js by gulp, using the 'typescript' task, which will transpile everything in that directory.
+
+appComponent.ts exports the AppComponent class, which is imported by boot.ts. Backticks in the template propery of AppComponent
+   allow for multi-line html.
+
+
+Where we are now, 2.4
+
+It begins with the html, which is stored in app.html. This contains html plus interpolated, local variables, which show up like {{this}}.
+app.html is imported by app.component.ts, which defines the <selector> that it is associated with. app.component.ts exports, as a class, the appComponent, which contains
+the definitions of the variables that are invoked with {{this}}. The app.component.ts file binds the properties to the template with {{this}}.
+also includes a constructor, which allows other angular programs to access its properties with
+this.name.syntax. Then there is index.html, which launches the site by importing the angular library, adds search paths, and includes the custom selectors
+that invoke the app.component.ts.
+Finally, the whole process is launched with >> gulp, which calls gulpfile.js, which launches several tasks, including transpiling the .ts into .js, and launching the server.
+All of this is assembled using npm on the package.json file.
+
+####################################################################
+
+EVENTS
+
+in the html opening tag, i.e. <span>, insert the standard name of the event (like html names, but without 'on', so 'onClick' = 'click') then = then name of method.
+Method is defined within the class of the appcomponent.
+    <span (click)="clickFooMethod()"
+
+TWO WAY BINDING
+-modify an element (way 1) AND change a property (way 2) simultaneously
+
+-Modifying an element:(with a function in the appComponent)
+   <label [innerHTML] = "foo"></label>
+   interpolation:    <p>name: {{foo}}</p>
+   square bracket:   <p [innerHTML]="'name: ' + foo"></p>
+   by function: add template variable, pass as argument in event:
+     <li #foo  (click)= "myFunction(foo)" >
+     This passes the whole element to the function. Inside the function, where foo is passed via arg variable (fooarg, for instance),
+     function looks like this:
+        onClick(fooarg){
+        fooarg.style.backgroundcolor='#FF9900';
+        }
+
+-Changing a property (usually with an event. Code is in html template)
+    <button (click)="myMethod($event, arg2)>Button</button>
+    :: (action) = "method of component class()"
+    The element can be stored in a template variable and used to access properties of that element:
+        <input #elementRef >
+            <button (click) = "myFunction(elementRef.value)">Press This</button>
+    arguments:
+        all event information - the event object - passed with keyword $event as argument.
+        look at console. Expand MouseEvent, find the 'target' tab, expand that, find 'innerHTML'.
+        This can be accessed with foo.target.html, where foo is first argument of method:
+            onClick(foo) {
+                console.log(foo.target.innerHTML);
+                }
+        With an *ngFor construction with temporary template variable #foo (*ngFOR = "#foo of fooArray")
+            the #foo can be passed as an event argument. If fooArray is a simple array of single values, that one will be
+            passed. If fooArray is an array of objects, the object will be passed.
+
+
+
+
+-Both:      <input [value] = "foo"  (input) = "foo=$event.target.value">
+       With this, whatever you type into the input field will immediadetly be written to the variable foo,which will then
+       be immediately pushed to html element value property, and wherever else foo is used.
+       There is another way to do both simultaneously, with @ngModel (for input fields) or @ngControl (for checkboxes, buttons, etc).
+            <input [(ngModel)]="foo" >
+
+CSS  styles can be added via the component:
+    @Component({
+        selector: 'my-app',
+        templateUrl: 'partials/app.html',
+        styles: '
+            backgroundcolor: #FFFFFF,'
+
+            or
+        styleUrls: 'app/css/mystyle.css'
+
+Data
+
+A more formal structure is the interface, which declares json style keys:
+    interaface ArtistFoo {
+        name: string;
+        shortname: string;
+        reknown: string;
+        bio: string;
+        }
+
+Subcomponents
+
+Let's say the html got too messy. Create subcomponents!
+    1. cut the offending html, paste it into subcomp.html
+    2. where the original html was, put in a new, made-up tag, and a property that will carry data from the mother html to the child html.
+            <new-tag> [artistproperty]=item </new-tag>
+            ('item' is template variable reading from a for-loop of an array)
+    3. Create a new component, import angular/core, then under the decorator, define selector, templateUrl, and inputs.
+
+        'inputs' takes an array of properties from the calling html tags. In this case, it was [artistproperty]
+        Then add an export class, no content.
+    4. change the template so that 'item' becomes 'artistproperty'
+    5. In the main component.tx, import the subcomponent, then, add this to the decorator:
+            directives: [ArtistItemComponent],     - the name of the subcomponent class.
+    6. WARNING: component css styles are not accessible to the subcomponent. Can fixed this by copy pasting css
+       in the subcomponent file as 'styles:', or a 'stylesUrl:'

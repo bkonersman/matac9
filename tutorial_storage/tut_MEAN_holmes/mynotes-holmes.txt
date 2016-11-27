@@ -1,0 +1,12 @@
+3.2.4
+got error, changed /views/layout.jade first line to read    doctype html     instead of      doctype 5
+
+>> express  //creates file structure and package.json file
+>> npm install //references package.json to load dependancies
+>> npm start    //starts application
+>> npm install -g nodemon    //detects changes
+>> nodemon   // this replaces npm start, and starts everything.
+
+got warning: npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.0.15
+
+created folder 'app_server', containing 'models', 'controllers', 'views', and 'routes'

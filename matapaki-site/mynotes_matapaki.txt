@@ -1,0 +1,46 @@
+To start, had to write my own lite server to change the ports, etc. It looks like this:
+
+    var bs = require("browser-sync").create();
+
+    // .init starts the server
+    bs.init({
+
+        server: ".",
+        port: process.env.PORT,
+        host: '0.0.0.0'
+    });
+
+    bs.reload();
+
+It is started at the command line, from the main directory, with >> node startlite.js
+
+If you want to run http-server directly, you should install it globally:
+
+    >> npm install http-server -g
+Then you can run the following:
+
+    >> http-server -a 0.0.0.0 -p 8080
+
+####################################################################################
+
+tried to copy and clone a2website to matapaki-site, but, when I launched any server, it would still refer to the a2 website.
+Also, 'npm start' was not working, using the wrong port. So I created a bs-config.js, which looks like this:
+
+    module.exports = {
+         "port": 8080
+    }
+
+Now, when I use 'npm start', everything works, from whatever site.
+
+####################################################################################
+
+sub components can be found easily if you add the moduleId metadata to the subcomponent component file:
+
+    @Component({
+      moduleId: module.id,
+      selector: 'navbar',
+      //templateUrl: './app/components/navbar/navbar.component.html'
+      templateUrl: 'navbar.component.html'
+    })
+
+This is thanks to systemjs, a program that was configured by systemjs.config.js. THis will work if you keep all sub files in the same directory as the component. Otherwise, use full paths.
